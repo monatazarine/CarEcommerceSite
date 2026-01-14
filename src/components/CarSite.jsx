@@ -10,6 +10,8 @@ const CarSite = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [message, setMessage] = useState('');
+
   const [filters, setFilters] = useState({
     type: 'all',
     priceRange: 'all',
@@ -93,7 +95,14 @@ const CarSite = () => {
 
   const addToCart = (car) => {
     setCart((prev) => [...prev, car]);
+    setMessage(`${car.name} has been added to your cart!`);
+    setTimeout(() => setMessage(''), 3000);
   };
+
+  const removeFromCart = (indexToRemove) => {
+  setCart((current) => current.filter((_, index) => index !== indexToRemove));
+};
+
 
   const cartItemCount = cart.length;
   const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
@@ -129,6 +138,12 @@ const CarSite = () => {
               </div>
             </div>
           </div>
+            {message && (
+                 <div className="toast-message">
+                   {message}
+                 </div>
+               )}
+ 
         </header>
 
         <div className="hero">
@@ -220,6 +235,7 @@ const CarSite = () => {
                     onClick={() => toggleFavorite(car.id)}
                     className="favorite-button"
                   >
+                 {/*Heart button*/}         
                     <Heart
                       className={`heart-icon ${
                         favorites.includes(car.id) ? 'favorited' : ''
@@ -325,6 +341,13 @@ const CarSite = () => {
                         ${item.price.toLocaleString()}
                       </p>
                     </div>
+                        {/* remove button */}
+                    <button
+                      className="mini-cart-remove"
+                      onClick={() => removeFromCart(index)}
+                    >
+                      Remove
+                    </button>
                   </div>
                 ))}
               </div>
