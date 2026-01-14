@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Search, Heart, ChevronDown, Filter, X } from 'lucide-react';
 
-const styles = `/* put your full CSS here, including mini-cart classes */`;
 
 const CarSite = () => {
   const [cart, setCart] = useState([]);
@@ -10,6 +9,8 @@ const CarSite = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+ const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+
   const [message, setMessage] = useState('');
 
   const [filters, setFilters] = useState({
@@ -109,7 +110,7 @@ const CarSite = () => {
 
   return (
     <>
-      <style>{styles}</style>
+
       <div className="app-container">
         <header className="header">
           <div className="header-container">
@@ -121,7 +122,7 @@ const CarSite = () => {
                 <h1 className="logo-text">Premium Auto</h1>
               </div>
               <div className="header-actions">
-                <button className="icon-button" title="Favorites">
+                <button className="icon-button" title="Favorites" onClick={() => setIsFavoritesOpen(true)}>
                   <Heart className="w-6 h-6" />
                   {favorites.length > 0 && <span className="badge">{favorites.length}</span>}
                 </button>
@@ -138,12 +139,7 @@ const CarSite = () => {
               </div>
             </div>
           </div>
-            {message && (
-                 <div className="toast-message">
-                   {message}
-                 </div>
-               )}
- 
+            
         </header>
 
         <div className="hero">
@@ -368,6 +364,69 @@ const CarSite = () => {
             </div>
           </div>
         )}
+        {isFavoritesOpen && (
+          <div
+            className="mini-cart-overlay"
+            onClick={() => setIsFavoritesOpen(false)}
+          >
+            <div
+              className="mini-cart"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mini-cart-header">
+                <span className="mini-cart-title">Your Favorites</span>
+                <button
+                  className="mini-cart-close"
+                  onClick={() => setIsFavoritesOpen(false)}
+                >
+                  <X style={{ width: 20, height: 20 }} />
+                </button>
+              </div>
+        
+              <div className="mini-cart-items">
+                {favorites.length === 0 && <p>No favorite cars yet.</p>}
+        
+                {favorites
+                  .map((favId) => cars.find((c) => c.id === favId))
+                  .filter(Boolean)
+                  .map((car) => (
+                    <div key={car.id} className="mini-cart-item">
+                      <img src={car.image} alt={car.name} />
+                      <div className="mini-cart-item-info">
+                        <p className="mini-cart-item-name">{car.name}</p>
+                        <p className="mini-cart-item-price">
+                          ${car.price.toLocaleString()}
+                        </p>
+                      </div>
+        
+                      {/* remove from favorites */}
+                      <button
+                        className="mini-cart-remove"
+                        onClick={() => toggleFavorite(car.id)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+             {message && (
+               <div className="toast-message">
+                 <span>{message}</span>
+                 <button
+                   className="toast-close"
+                   onClick={() => setMessage('')}
+                   aria-label="Close notification"
+                 >
+                   ×
+                 </button>
+               </div>
+             )}
+
+ 
       </div>
     </>
   );
