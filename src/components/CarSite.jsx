@@ -2,6 +2,61 @@ import React, { useState } from 'react';
 import { ShoppingCart, Search, Heart, ChevronDown, Filter, X } from 'lucide-react';
 
 
+
+const Checkout = ({ cart, total, onClose }) => {
+  if (cart.length === 0) {
+    return (
+      <div className="checkout">
+        <h2 className="checkout-title">Checkout</h2>
+        <p>No items in cart.</p>
+        <button className="checkout-close" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="checkout">
+      <h2 className="checkout-title">Checkout</h2>
+
+      <div className="checkout-items">
+        {cart.map((item, index) => (
+          <div key={index} className="checkout-item">
+            <span className="checkout-item-name">{item.name}</span>
+            <span className="checkout-item-price">
+              ${item.price.toLocaleString()}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="checkout-summary-row">
+        <span>Total</span>
+        <span>${total.toLocaleString()}</span>
+      </div>
+
+      <div className="checkout-actions">
+        <button className="checkout-close" onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          className="checkout-confirm"
+          onClick={() => {
+            // here you could later call an API
+            alert('Order placed!');
+            onClose();
+          }}
+        >
+          Place Order
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
+
 const CarSite = () => {
   const [cart, setCart] = useState([]);
   const [favorites, setFavorites] = useState([]);
@@ -9,6 +64,8 @@ const CarSite = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+           
  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
   const [message, setMessage] = useState('');
@@ -357,7 +414,11 @@ const CarSite = () => {
                   <span>Total</span>
                   <span>${cartTotal.toLocaleString()}</span>
                 </div>
-                <button className="mini-cart-checkout">
+                <button className="mini-cart-checkout"
+                     onClick={() => {
+                       setIsCartOpen(false);
+                       setIsCheckoutOpen(true);
+                     }}>
                   Proceed to Checkout
                 </button>
               </div>
@@ -412,6 +473,24 @@ const CarSite = () => {
             </div>
           </div>
         )}
+             {isCheckoutOpen && (
+                 <div
+                   className="mini-cart-overlay"
+                   onClick={() => setIsCheckoutOpen(false)}
+                 >
+                   <div
+                     className="mini-cart"
+                     onClick={(e) => e.stopPropagation()}
+                   >
+                     <Checkout
+                       cart={cart}
+                       total={cartTotal}
+                       onClose={() => setIsCheckoutOpen(false)}
+                     />
+                   </div>
+                 </div>
+               )}
+
 
              {message && (
                <div className="toast-message">
