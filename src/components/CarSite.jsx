@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Search, Heart, ChevronDown, Filter, X } from 'lucide-react';
 
+const styles = `/* put your full CSS here, including mini-cart classes */`;
 
 const CarSite = () => {
   const [cart, setCart] = useState([]);
@@ -8,14 +9,14 @@ const CarSite = () => {
   const [selectedCar, setSelectedCar] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [filters, setFilters] = useState({
     type: 'all',
     priceRange: 'all',
-    year: 'all'
+    year: 'all',
   });
 
-  const cars = [
-    {
+  const cars = [ {
       id: 1,
       name: 'Tesla Model S',
       type: 'Electric',
@@ -71,10 +72,12 @@ const CarSite = () => {
     }
   ];
 
-  const filteredCars = cars.filter(car => {
+
+  const filteredCars = cars.filter((car) => {
     const matchesSearch = car.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filters.type === 'all' || car.type === filters.type;
-    const matchesPrice = filters.priceRange === 'all' || 
+    const matchesPrice =
+      filters.priceRange === 'all' ||
       (filters.priceRange === 'under75k' && car.price < 75000) ||
       (filters.priceRange === '75k-100k' && car.price >= 75000 && car.price < 100000) ||
       (filters.priceRange === 'over100k' && car.price >= 100000);
@@ -83,20 +86,22 @@ const CarSite = () => {
   });
 
   const toggleFavorite = (id) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(fav => fav !== id) : [...prev, id]
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]
     );
   };
 
   const addToCart = (car) => {
-    setCart(prev => [...prev, car]);
-    setSelectedCar(null);
+    setCart((prev) => [...prev, car]);
   };
+
+  const cartItemCount = cart.length;
+  const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
 
   return (
     <>
+      <style>{styles}</style>
       <div className="app-container">
-        {/* Header */}
         <header className="header">
           <div className="header-container">
             <div className="header-content">
@@ -109,14 +114,16 @@ const CarSite = () => {
               <div className="header-actions">
                 <button className="icon-button" title="Favorites">
                   <Heart className="w-6 h-6" />
-                  {favorites.length > 0 && (
-                    <span className="badge">{favorites.length}</span>
-                  )}
+                  {favorites.length > 0 && <span className="badge">{favorites.length}</span>}
                 </button>
-                <button className="icon-button" title="Cart">
+                <button
+                  className="icon-button"
+                  title="Cart"
+                  onClick={() => setIsCartOpen(true)}
+                >
                   <ShoppingCart className="w-6 h-6" />
-                  {cart.length > 0 && (
-                    <span className="badge badge-blue">{cart.length}</span>
+                  {cartItemCount > 0 && (
+                    <span className="badge badge-blue">{cartItemCount}</span>
                   )}
                 </button>
               </div>
@@ -124,7 +131,6 @@ const CarSite = () => {
           </div>
         </header>
 
-        {/* Hero Section */}
         <div className="hero">
           <div className="hero-overlay"></div>
           <div className="hero-content">
@@ -147,21 +153,20 @@ const CarSite = () => {
         <main className="main-content">
           <div className="content-header">
             <h3 className="content-title">Available Vehicles ({filteredCars.length})</h3>
-            <button 
+            <button
               onClick={() => setFilterOpen(!filterOpen)}
               className="filter-button"
             >
               <Filter style={{ width: '20px', height: '20px' }} />
               <span>Filters</span>
-              <ChevronDown 
-                className={`chevron ${filterOpen ? 'open' : ''}`} 
-                style={{ width: '16px', height: '16px' }} 
+              <ChevronDown
+                className={`chevron ${filterOpen ? 'open' : ''}`}
+                style={{ width: '16px', height: '16px' }}
               />
             </button>
           </div>
 
-          {/* Filters Panel */}
-          {filterOpen && (
+           {filterOpen && (
             <div className="filter-panel">
               <div className="filter-grid">
                 <div>
@@ -169,7 +174,7 @@ const CarSite = () => {
                   <select 
                     value={filters.type} 
                     onChange={(e) => setFilters({...filters, type: e.target.value})}
-                    className="filter-select"
+                     className="filter-select"
                   >
                     <option value="all">All Types</option>
                     <option value="Electric">Electric</option>
@@ -206,26 +211,25 @@ const CarSite = () => {
             </div>
           )}
 
-          {/* Car Grid */}
           <div className="car-grid">
-            {filteredCars.map(car => (
-              <article key={car.id} className="car-card">
+            {filteredCars.map((car) => (
+              <div key={car.id} className="car-card">
                 <div className="car-image-container">
                   <img src={car.image} alt={car.name} className="car-image" />
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(car.id);
-                    }}
+                  <button
+                    onClick={() => toggleFavorite(car.id)}
                     className="favorite-button"
                   >
-                    <Heart 
-                      className={`heart-icon ${favorites.includes(car.id) ? 'favorited' : ''}`} 
-                      style={{ width: '20px', height: '20px' }} 
+                    <Heart
+                      className={`heart-icon ${
+                        favorites.includes(car.id) ? 'favorited' : ''
+                      }`}
+                      style={{ width: '20px', height: '20px' }}
                     />
                   </button>
                   <div className="car-type-badge">{car.type}</div>
                 </div>
+
                 <div className="car-details">
                   <h3 className="car-name">{car.name}</h3>
                   <p className="car-year">{car.year} Model</p>
@@ -238,7 +242,7 @@ const CarSite = () => {
                   </div>
                   <div className="car-footer">
                     <span className="car-price">${car.price.toLocaleString()}</span>
-                    <button 
+                    <button
                       onClick={() => setSelectedCar(car)}
                       className="view-details-button"
                     >
@@ -246,18 +250,21 @@ const CarSite = () => {
                     </button>
                   </div>
                 </div>
-              </article>
+              </div>
             ))}
           </div>
         </main>
 
-        {/* Car Detail Modal */}
         {selectedCar && (
           <div className="modal-overlay" onClick={() => setSelectedCar(null)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-image-container">
-                <img src={selectedCar.image} alt={selectedCar.name} className="modal-image" />
-                <button 
+                <img
+                  src={selectedCar.image}
+                  alt={selectedCar.name}
+                  className="modal-image"
+                />
+                <button
                   onClick={() => setSelectedCar(null)}
                   className="modal-close-button"
                 >
@@ -266,7 +273,9 @@ const CarSite = () => {
               </div>
               <div className="modal-body">
                 <h2 className="modal-title">{selectedCar.name}</h2>
-                <p className="modal-subtitle">{selectedCar.year} {selectedCar.type}</p>
+                <p className="modal-subtitle">
+                  {selectedCar.year} {selectedCar.type}
+                </p>
                 <div className="modal-specs-grid">
                   {Object.entries(selectedCar.specs).map(([key, value]) => (
                     <div key={key} className="modal-spec-card">
@@ -276,8 +285,10 @@ const CarSite = () => {
                   ))}
                 </div>
                 <div className="modal-footer">
-                  <span className="modal-price">${selectedCar.price.toLocaleString()}</span>
-                  <button 
+                  <span className="modal-price">
+                    ${selectedCar.price.toLocaleString()}
+                  </span>
+                  <button
                     onClick={() => addToCart(selectedCar)}
                     className="add-to-cart-button"
                   >
@@ -285,6 +296,51 @@ const CarSite = () => {
                     <span>Add to Cart</span>
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isCartOpen && (
+          <div className="mini-cart-overlay" onClick={() => setIsCartOpen(false)}>
+            <div className="mini-cart" onClick={(e) => e.stopPropagation()}>
+              <div className="mini-cart-header">
+                <span className="mini-cart-title">Your Cart</span>
+                <button
+                  className="mini-cart-close"
+                  onClick={() => setIsCartOpen(false)}
+                >
+                  <X style={{ width: 20, height: 20 }} />
+                </button>
+              </div>
+
+              <div className="mini-cart-items">
+                {cart.length === 0 && <p>No items in cart.</p>}
+                {cart.map((item, index) => (
+                  <div key={index} className="mini-cart-item">
+                    <img src={item.image} alt={item.name} />
+                    <div className="mini-cart-item-info">
+                      <p className="mini-cart-item-name">{item.name}</p>
+                      <p className="mini-cart-item-price">
+                        ${item.price.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mini-cart-footer">
+                <div className="mini-cart-summary">
+                  <span>Items</span>
+                  <span>{cartItemCount}</span>
+                </div>
+                <div className="mini-cart-summary">
+                  <span>Total</span>
+                  <span>${cartTotal.toLocaleString()}</span>
+                </div>
+                <button className="mini-cart-checkout">
+                  Proceed to Checkout
+                </button>
               </div>
             </div>
           </div>
